@@ -26,6 +26,8 @@ fn accept_callback(req: Request, res: Response<Fresh>) {
 
     println!("{:?}\n{:?}\n{:?}\n{:?}\n{:?}", req.remote_addr, req.method, req.headers, req.uri, req.version);
 
+    let web_dir = wfs::DirNode::new(Path::new("website"));
+
     match req.method {
 
         Get => {
@@ -54,9 +56,27 @@ fn accept_callback(req: Request, res: Response<Fresh>) {
             res.write_all(buf.as_ref()).unwrap();
             res.end().unwrap();
         }
+        else if uri == "/" {
+            let mut res = res.start().unwrap();
+            //res.write_all("ウィキペディアへようこそ".to_string().as_bytes()).unwrap();
+            let file : &wfs::FileNode = &web_dir.files[0];
+            match file.data {
+                wfs::WebFile::Bin(ref buf)  =>  res.write_all(buf.as_ref()).unwrap(),
+                _                           =>  {},
+            }
+            //res.write_all()
+            //res.write_all(file.).unwrap();
+            res.end().unwrap();
+        }
         else {
             let mut res = res.start().unwrap();
-            res.write_all("ウィキペディアへようこそ".to_string().as_bytes()).unwrap();
+            //res.write_all("ウィキペディアへようこそ".to_string().as_bytes()).unwrap();
+            let file : &wfs::FileNode = &web_dir.files[1];
+            match file.data {
+                wfs::WebFile::Bin(ref buf)  =>  res.write_all(buf.as_ref()).unwrap(),
+                _                           =>  {},
+            }
+            //res.write_all()
             //res.write_all(file.).unwrap();
             res.end().unwrap();
         }

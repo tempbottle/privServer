@@ -18,14 +18,14 @@ pub enum WebFile {
 }
 
 pub struct DirNode {
-    name : String, // the name of this directory
-    files : Vec<FileNode>,
-    sub_dir : Vec<DirNode>,
+    pub name : String, // the name of this directory
+    pub files : Vec<FileNode>,
+    pub sub_dir : Vec<DirNode>,
 }
 
 pub struct FileNode {
-    name : String,
-    data : WebFile,
+    pub name : String,
+    pub data : WebFile,
 }
 
 impl DirNode {
