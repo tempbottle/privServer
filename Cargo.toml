@@ -3,6 +3,6 @@ hyper = "0.5.2"
 openssl = "0.6"
 
 [package]
-name = "privateServer"
+name = "private_server"
 version = "0.1.0"
 authors = ["Chris von Zuben <chris.vonzuben@gmail.com>"]
