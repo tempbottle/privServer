@@ -26,8 +26,6 @@ fn accept_callback(req: Request, res: Response<Fresh>) {
 
     println!("{:?}\n{:?}\n{:?}\n{:?}\n{:?}", req.remote_addr, req.method, req.headers, req.uri, req.version);
 
-    let web_dir = wfs::DirNode::new(Path::new("website"));
-
     match req.method {
 
         Get => {
@@ -40,69 +38,37 @@ fn accept_callback(req: Request, res: Response<Fresh>) {
 
     }
 
-    // test sending a picture
-    //let pic = Path::new("favicon.ico");
+    let ws = wfs::WebFs::new(Path::new("website"));
+
+    let mut res = res.start().unwrap();
 
     if let hyper::uri::RequestUri::AbsolutePath(uri) = req.uri {
 
-        if uri == "/favicon.ico" {
-            let mut file = std::fs::File::open("favicon.ico").unwrap();
-            let mut buf = Vec::new();
-            file.read_to_end(&mut buf).unwrap();
+        if uri == "/" {
 
-            println!("{}", buf.len());
-
-            let mut res = res.start().unwrap();
-            res.write_all(buf.as_ref()).unwrap();
-            res.end().unwrap();
-        }
-        else if uri == "/" {
-            let mut res = res.start().unwrap();
-            //res.write_all("ウィキペディアへようこそ".to_string().as_bytes()).unwrap();
-            let file : &wfs::FileNode = &web_dir.files[0];
-            match file.data {
-                wfs::WebFile::Bin(ref buf)  =>  res.write_all(buf.as_ref()).unwrap(),
-                _                           =>  {},
+            match ws.map.get("/index.html") {
+                Some(&wfs::WebFile::Bin(ref buf)) => res.write_all(buf.as_ref()).unwrap(),
+                _   =>  {}
             }
-            //res.write_all()
-            //res.write_all(file.).unwrap();
-            res.end().unwrap();
+
         }
         else {
-            let mut res = res.start().unwrap();
-            //res.write_all("ウィキペディアへようこそ".to_string().as_bytes()).unwrap();
-            let file : &wfs::FileNode = &web_dir.files[1];
-            match file.data {
-                wfs::WebFile::Bin(ref buf)  =>  res.write_all(buf.as_ref()).unwrap(),
-                _                           =>  {},
+
+            match ws.map.get(&uri) {
+                Some(&wfs::WebFile::Bin(ref buf)) => res.write_all(buf.as_ref()).unwrap(),
+                _   =>  {}
             }
-            //res.write_all()
-            //res.write_all(file.).unwrap();
-            res.end().unwrap();
+
         }
+
     }
+
+    res.end().unwrap();
 }
 
 fn main() {
 
-    // need to do something where i load all the website files in to a data structure for quick reference
-    let p = Path::new("deps");
-
-    if let Ok(dir_i) = std::fs::read_dir(p) {
-        for file in dir_i {
-            if let Ok(file) = file {
-                println!("{:?}", file.path());
-            }
-        }
-    }
-    else{
-        println!("deps dir does not exists");
-    }
-
     println!("==============");
-
-    //test success
-    let web_dir = wfs::DirNode::new(Path::new("website"));
 
     let cert = Path::new("server.crt");
     let key = Path::new("server.key");
