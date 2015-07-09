@@ -26,40 +26,26 @@ fn accept_callback(req: Request, res: Response<Fresh>) {
 
     println!("{:?}\n{:?}\n{:?}\n{:?}\n{:?}", req.remote_addr, req.method, req.headers, req.uri, req.version);
 
+    let ws = wfs::WebFs::new(Path::new("website"));
+
+    let mut res = res.start().unwrap();
+
     match req.method {
 
         Get => {
+            if let hyper::uri::RequestUri::AbsolutePath(uri) = req.uri {
 
+                match ws.get(&uri) {
+                    Some(&wfs::WebFile::Bin(ref buf)) => res.write_all(buf).unwrap(),
+                    _   =>  {}
+                }
+
+            }
         }
         Post => {
 
         }
         _ => {}
-
-    }
-
-    let ws = wfs::WebFs::new(Path::new("website"));
-
-    let mut res = res.start().unwrap();
-
-    if let hyper::uri::RequestUri::AbsolutePath(uri) = req.uri {
-
-        if uri == "/" {
-
-            match ws.map.get("/index.html") {
-                Some(&wfs::WebFile::Bin(ref buf)) => res.write_all(buf.as_ref()).unwrap(),
-                _   =>  {}
-            }
-
-        }
-        else {
-
-            match ws.map.get(&uri) {
-                Some(&wfs::WebFile::Bin(ref buf)) => res.write_all(buf.as_ref()).unwrap(),
-                _   =>  {}
-            }
-
-        }
 
     }
 

@@ -62,6 +62,14 @@ impl WebFs {
 
     }
 
+    pub fn get(&self, key: &String) -> Option<&WebFile> {
+        if key == "/" {
+            self.map.get("/index.html")
+        } else {
+            self.map.get(key) 
+        }
+    }
+
     fn walk_dir_helper(path: &Path, website: &mut WebFs) {
 
         let metadata = walk_dir_err_chk!(fs::metadata(path));
@@ -92,6 +100,7 @@ impl WebFs {
                         website.map.insert(file_name_string, WebFile::Bin(buf));
                     } else {
                         println!("The path converted to an empty string. Weird file name?");
+                        println!("{:?}", entry.path());
                         panic!();
                     }
 
