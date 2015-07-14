@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# this is for createing your own CA to sign your own keys. Must put rootCA.crt on the browser
+# that will be used to load the site. the server needs to use both server file
+
 # requires openssl to be installed
 # the server files need to be put in the right place for the sever to initialize properly
 

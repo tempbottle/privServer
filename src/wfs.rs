@@ -62,11 +62,11 @@ impl WebFs {
 
     }
 
-    pub fn get(&self, key: &String) -> Option<&WebFile> {
+    pub fn get<'a>(&'a self, key: &String) -> Option<&'a WebFile> {
         if key == "/" {
             self.map.get("/index.html")
         } else {
-            self.map.get(key) 
+            self.map.get(key)
         }
     }
 
